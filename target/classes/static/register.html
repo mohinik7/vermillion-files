@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div class="container">
+    <header class="topbar">
+        <a href="/" class="brand">✦ The Vermillion Files</a>
+        <a class="btn-link" href="/login.html">Sign In</a>
+    </header>
+    <p class="eyebrow">Open a New Case File</p>
+    <h2 class="candle-glow">Register</h2>
+    <div class="card layout-stack">
+        <input id="username" placeholder="Username">
+        <input id="email" placeholder="Email">
+        <input id="password" type="password" placeholder="Password">
+        <button id="registerBtn">Register</button>
+        <p id="msg" class="muted"></p>
+    </div>
+</div>
+<script src="/app.js"></script>
+<script>
+document.getElementById("registerBtn").onclick = async () => {
+    const username = document.getElementById("username").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+    if (!username || !email || password.length < 6) {
+        document.getElementById("msg").textContent = "Fill all fields (password >= 6 chars).";
+        return;
+    }
+    try {
+        await api("/api/auth/register", { method: "POST", body: JSON.stringify({ username, email, password }) });
+        window.location.href = "/login.html";
+    } catch (e) {
+        document.getElementById("msg").textContent = e.message;
+    }
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+package com.mysteryengine.repository;
+
+import com.mysteryengine.model.Review;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface ReviewRepository extends JpaRepository<Review, Long> {
+    List<Review> findByMysteryId(String mysteryId);
+    List<Review> findByUserId(Long userId);
+}

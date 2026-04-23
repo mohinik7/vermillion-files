@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hall of Mysteries</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div class="container">
+    <header class="topbar">
+        <a href="/" class="brand">✦ The Vermillion Files</a>
+        <div class="btn-row">
+            <a class="btn-link" href="/profile.html">Profile</a>
+            <a class="btn-link" href="/login.html">Switch Detective</a>
+        </div>
+    </header>
+    <p class="eyebrow">Choose Your Investigation</p>
+    <h2 class="candle-glow">Hall of Mysteries</h2>
+    <div class="card">
+        <label>Genre</label>
+        <select id="genre"><option value="">All</option><option>Crime</option></select>
+        <label>Difficulty</label>
+        <select id="difficulty"><option value="">All</option><option>Hard</option></select>
+        <div class="btn-row">
+            <button id="filterBtn">Apply Filter</button>
+        </div>
+    </div>
+    <div id="cards" class="grid"></div>
+</div>
+<script src="/app.js"></script>
+<script>
+async function loadMysteries() {
+    const genre = document.getElementById("genre").value;
+    const difficulty = document.getElementById("difficulty").value;
+    const query = new URLSearchParams();
+    if (genre) query.set("genre", genre);
+    if (difficulty) query.set("difficulty", difficulty);
+    const mysteries = await api(`/api/mysteries?${query.toString()}`);
+    const cards = document.getElementById("cards");
+    cards.innerHTML = "";
+    mysteries.forEach(m => {
+        const div = document.createElement("div");
+        div.className = "card mystery-card";
+        div.innerHTML = `<p class="meta">${m.genre} · ${m.difficulty}</p><h3>${m.title}</h3><p class="muted">${m.teaser}</p><p>⭐ ${m.averageRating}</p>`;
+        const button = document.createElement("button");
+        button.textContent = "Take the Case";
+        button.onclick = async () => {
+            const payload = await api("/api/sessions", { method: "POST", body: JSON.stringify({ mysteryId: m.id }) });
+            localStorage.setItem("sessionId", payload.sessionId);
+            window.location.href = "/game.html";
+        };
+        div.appendChild(button);
+        cards.appendChild(div);
+    });
+}
+document.getElementById("filterBtn").onclick = loadMysteries;
+loadMysteries();
+</script>
+</body>
+</html>

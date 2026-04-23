@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Session</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div class="container">
+    <header class="topbar">
+        <a href="/" class="brand">✦ The Vermillion Files</a>
+        <a class="btn-link" href="/hall.html">Back to Hall</a>
+    </header>
+    <p class="eyebrow">Case In Progress</p>
+    <h2 class="candle-glow">Night Investigation</h2>
+    <div class="game-grid">
+        <div class="card">
+            <h3 id="sceneTitle"></h3>
+            <p id="sceneAtmosphere" class="muted"></p>
+            <p id="sceneNarrative"></p>
+            <div id="choices"></div>
+        </div>
+        <div class="card">
+            <h3>Evidence Board</h3>
+            <div id="clues"></div>
+        </div>
+        <div class="card">
+            <h3>Suspect Tracker</h3>
+            <div id="suspects"></div>
+        </div>
+    </div>
+</div>
+<script src="/app.js"></script>
+<script>
+const sessionId = localStorage.getItem("sessionId");
+if (!sessionId) window.location.href = "/hall.html";
+
+async function loadScene() {
+    const scene = await api(`/api/game/scene?sessionId=${sessionId}`);
+    document.getElementById("sceneTitle").textContent = scene.title;
+    document.getElementById("sceneAtmosphere").textContent = `Atmosphere: ${scene.atmosphere}`;
+    document.getElementById("sceneNarrative").textContent = scene.narrative;
+
+    const choicesDiv = document.getElementById("choices");
+    choicesDiv.innerHTML = "";
+    scene.choices.forEach(c => {
+        const btn = document.createElement("button");
+        btn.className = "choice";
+        btn.textContent = c.text;
+        btn.disabled = !c.enabled;
+        btn.onclick = async () => {
+            await api("/api/game/choice", { method: "POST", body: JSON.stringify({ sessionId, choiceId: c.id }) });
+            await loadScene();
+        };
+        choicesDiv.appendChild(btn);
+    });
+
+    const newClues = await api(`/api/game/clues?sessionId=${sessionId}&sceneId=${scene.sceneId}`);
+    const clues = document.getElementById("clues");
+    newClues.forEach(clue => {
+        if (document.getElementById(`clue-${clue.id}`)) return;
+        const div = document.createElement("div");
+        div.id = `clue-${clue.id}`;
+        div.className = "card";
+        div.innerHTML = `<strong>${clue.type}</strong><p>${clue.description}</p>`;
+        clues.appendChild(div);
+    });
+
+    const suspects = document.getElementById("suspects");
+    suspects.innerHTML = "";
+    scene.suspects.forEach(s => {
+        const div = document.createElement("div");
+        div.className = "card";
+        div.innerHTML = `<strong>${s.name}</strong><p class="muted">${s.alibi}</p><p>${s.facts}</p><p class="status-pill">Tag: ${s.tag}</p>`;
+        ["Cleared", "Suspicious", "Prime Suspect"].forEach(tag => {
+            const t = document.createElement("button");
+            t.className = "tag-btn";
+            t.textContent = tag;
+            t.onclick = async () => {
+                await api("/api/game/suspect-tag", { method: "POST", body: JSON.stringify({ sessionId, suspectId: s.id, tag }) });
+                await loadScene();
+            };
+            div.appendChild(t);
+        });
+        suspects.appendChild(div);
+    });
+
+    if (scene.ending) {
+        window.location.href = "/resolution.html";
+    }
+}
+loadScene();
+</script>
+</body>
+</html>

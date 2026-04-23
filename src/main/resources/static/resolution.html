@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resolution</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div class="container">
+    <header class="topbar">
+        <a href="/" class="brand">✦ The Vermillion Files</a>
+        <a class="btn-link" href="/hall.html">Return to Hall</a>
+    </header>
+    <p class="eyebrow">Final Verdict</p>
+    <h2 class="candle-glow">Resolution</h2>
+    <div class="card" id="resultCard"></div>
+    <div class="card">
+        <div class="btn-row">
+            <button id="downloadBtn">Download Case File XML</button>
+            <a class="btn-link" href="/hall.html">Back to Hall</a>
+        </div>
+    </div>
+    <div class="card">
+        <h3>Rate this Mystery</h3>
+        <input id="mysteryId" placeholder="Mystery ID (e.g., docks-01)">
+        <select id="rating"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select>
+        <textarea id="comment" placeholder="Optional review"></textarea>
+        <button id="submitReviewBtn">Submit Review</button>
+    </div>
+</div>
+<script src="/app.js"></script>
+<script>
+const sessionId = localStorage.getItem("sessionId");
+async function loadResolution() {
+    const data = await api(`/api/sessions/${sessionId}/resolution`);
+    document.getElementById("resultCard").innerHTML =
+        `<p>Status: <strong>${data.status}</strong></p>
+         <p>Score: <strong>${data.score}</strong></p>
+         <p>Scenes Visited: ${data.scenesVisited}</p>
+         <p>Wrong Branches: ${data.wrongBranches}</p>
+         <p>Clues: ${data.cluesFound}/${data.totalClues}</p>`;
+}
+document.getElementById("downloadBtn").onclick = () => {
+    window.location.href = `/api/sessions/${sessionId}/casefile`;
+};
+document.getElementById("submitReviewBtn").onclick = async () => {
+    await api("/api/reviews", {
+        method: "POST",
+        body: JSON.stringify({
+            mysteryId: document.getElementById("mysteryId").value.trim() || "docks-01",
+            rating: document.getElementById("rating").value,
+            comment: document.getElementById("comment").value
+        })
+    });
+    alert("Review submitted");
+};
+loadResolution();
+</script>
+</body>
+</html>

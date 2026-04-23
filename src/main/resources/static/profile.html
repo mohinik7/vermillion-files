@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div class="container">
+    <header class="topbar">
+        <a href="/" class="brand">✦ The Vermillion Files</a>
+        <a class="btn-link" href="/hall.html">Back to Hall</a>
+    </header>
+    <p class="eyebrow">Detective Records</p>
+    <h2 class="candle-glow">Profile</h2>
+    <div class="card" id="stats"></div>
+</div>
+<script src="/app.js"></script>
+<script>
+const userId = localStorage.getItem("userId");
+async function loadStats() {
+    const data = await api(`/api/players/${userId}/stats`);
+    document.getElementById("stats").innerHTML =
+        `<p>Sessions: ${data.sessions}</p>
+         <p>Solved Cases: ${data.solved}</p>
+         <p>Average Score: ${data.avgScore}</p>
+         <p>Reviews Written: ${data.reviews}</p>`;
+}
+loadStats();
+</script>
+</body>
+</html>

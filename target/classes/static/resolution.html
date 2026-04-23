@@ -14,8 +14,10 @@
     </header>
     <p class="eyebrow">Final Verdict</p>
     <h2 class="candle-glow">Resolution</h2>
-    <div class="card" id="resultCard"></div>
+    <div class="card result-card" id="resultCard"></div>
     <div class="card">
+        <p class="meta">Case File Export</p>
+        <div class="amber-divider"></div>
         <div class="btn-row">
             <button id="downloadBtn">Download Case File XML</button>
             <a class="btn-link" href="/hall.html">Back to Hall</a>
@@ -23,7 +25,9 @@
     </div>
     <div class="card">
         <h3>Rate this Mystery</h3>
-        <input id="mysteryId" placeholder="Mystery ID (e.g., docks-01)">
+        <p class="muted">Leave a note for the next detective who lifts this candle.</p>
+        <div class="amber-divider"></div>
+        <input id="mysteryId" placeholder="Mystery ID (e.g., vermillion-hour)">
         <select id="rating"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select>
         <textarea id="comment" placeholder="Optional review"></textarea>
         <button id="submitReviewBtn">Submit Review</button>
@@ -32,10 +36,13 @@
 <script src="/app.js"></script>
 <script>
 const sessionId = localStorage.getItem("sessionId");
+const activeMysteryId = localStorage.getItem("activeMysteryId") || "vermillion-hour";
+document.getElementById("mysteryId").value = activeMysteryId;
 async function loadResolution() {
     const data = await api(`/api/sessions/${sessionId}/resolution`);
     document.getElementById("resultCard").innerHTML =
-        `<p>Status: <strong>${data.status}</strong></p>
+        `<p class="meta">Case Outcome</p>
+         <p>Status: <strong>${data.status}</strong></p>
          <p>Score: <strong>${data.score}</strong></p>
          <p>Scenes Visited: ${data.scenesVisited}</p>
          <p>Wrong Branches: ${data.wrongBranches}</p>
@@ -48,12 +55,12 @@ document.getElementById("submitReviewBtn").onclick = async () => {
     await api("/api/reviews", {
         method: "POST",
         body: JSON.stringify({
-            mysteryId: document.getElementById("mysteryId").value.trim() || "docks-01",
+            mysteryId: document.getElementById("mysteryId").value.trim() || "vermillion-hour",
             rating: document.getElementById("rating").value,
             comment: document.getElementById("comment").value
         })
     });
-    alert("Review submitted");
+    alert("Review entered in the ledger");
 };
 loadResolution();
 </script>

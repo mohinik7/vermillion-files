@@ -11,51 +11,128 @@
     <header class="topbar">
         <a href="/" class="brand">✦ The Vermillion Files</a>
         <div class="btn-row">
-            <a class="btn-link" href="/profile.html">Profile</a>
-            <a class="btn-link" href="/login.html">Switch Detective</a>
+            <a class="btn-link" href="/login.html">Sign In</a>
+            <a class="btn-link" href="/register.html">Take the Case</a>
         </div>
     </header>
     <p class="eyebrow">Choose Your Investigation</p>
     <h2 class="candle-glow">Hall of Mysteries</h2>
-    <div class="card">
-        <label>Genre</label>
-        <select id="genre"><option value="">All</option><option>Crime</option></select>
-        <label>Difficulty</label>
-        <select id="difficulty"><option value="">All</option><option>Hard</option></select>
-        <div class="btn-row">
-            <button id="filterBtn">Apply Filter</button>
-        </div>
+    <p class="hero-text muted">Each candle marks a case unsolved. Lift one from its sconce, and the night is yours.</p>
+
+    <div class="hall-layout">
+        <section>
+            <div class="card hall-filter">
+                <label for="genre">Genre</label>
+                <select id="genre"><option value="">All</option></select>
+                <label for="difficulty">Difficulty</label>
+                <select id="difficulty"><option value="">All</option></select>
+                <label for="sortBy">Order By</label>
+                <select id="sortBy">
+                    <option value="rating">rating</option>
+                    <option value="plays">plays</option>
+                    <option value="title">title</option>
+                </select>
+                <div class="btn-row">
+                    <button id="filterBtn">Apply Filter</button>
+                    <p id="resultCount" class="meta"></p>
+                </div>
+            </div>
+            <div id="cards" class="grid"></div>
+        </section>
+
+        <aside class="card">
+            <p class="meta">Renown</p>
+            <h3>Top Detectives</h3>
+            <ul class="leaderboard-list" id="leaderboard"></ul>
+        </aside>
     </div>
-    <div id="cards" class="grid"></div>
-</div>
+    </div>
 <script src="/app.js"></script>
 <script>
-async function loadMysteries() {
-    const genre = document.getElementById("genre").value;
-    const difficulty = document.getElementById("difficulty").value;
-    const query = new URLSearchParams();
-    if (genre) query.set("genre", genre);
-    if (difficulty) query.set("difficulty", difficulty);
-    const mysteries = await api(`/api/mysteries?${query.toString()}`);
+let allMysteries = [];
+
+const leaderboard = [
+    { name: "M. Blackwood", mystery: "Vermillion Hour", score: 4280 },
+    { name: "Inspector Halloran", mystery: "Carrick Veil", score: 3940 },
+    { name: "A. Whitcombe", mystery: "Vermillion Hour", score: 3812 },
+    { name: "Sgt. Donnelly", mystery: "Carrick Veil", score: 3540 },
+    { name: "C. Marlowe", mystery: "Vermillion Hour", score: 3201 }
+];
+
+function renderLeaderboard() {
+    const root = document.getElementById("leaderboard");
+    root.innerHTML = "";
+    leaderboard.forEach((r, i) => {
+        const li = document.createElement("li");
+        li.className = "leaderboard-item";
+        li.innerHTML = `
+            <span class="rank">${i + 1}</span>
+            <div>
+                <div>${r.name}</div>
+                <div class="meta">${r.mystery}</div>
+            </div>
+            <span class="rating-row">${r.score}</span>
+        `;
+        root.appendChild(li);
+    });
+}
+
+function populateFilters(mysteries) {
+    const genre = document.getElementById("genre");
+    const difficulty = document.getElementById("difficulty");
+    const genres = [...new Set(mysteries.map(m => m.genre).filter(Boolean))].sort();
+    const difficulties = [...new Set(mysteries.map(m => m.difficulty).filter(Boolean))];
+    const chosenGenre = genre.value;
+    const chosenDifficulty = difficulty.value;
+    genre.innerHTML = `<option value="">All</option>${genres.map(g => `<option value="${g}">${g}</option>`).join("")}`;
+    difficulty.innerHTML = `<option value="">All</option>${difficulties.map(d => `<option value="${d}">${d}</option>`).join("")}`;
+    genre.value = chosenGenre;
+    difficulty.value = chosenDifficulty;
+}
+
+function renderCards(mysteries) {
     const cards = document.getElementById("cards");
+    document.getElementById("resultCount").textContent = `${mysteries.length} ${mysteries.length === 1 ? "case" : "cases"}`;
     cards.innerHTML = "";
     mysteries.forEach(m => {
-        const div = document.createElement("div");
+        const div = document.createElement("article");
         div.className = "card mystery-card";
-        div.innerHTML = `<p class="meta">${m.genre} · ${m.difficulty}</p><h3>${m.title}</h3><p class="muted">${m.teaser}</p><p>⭐ ${m.averageRating}</p>`;
-        const button = document.createElement("button");
-        button.textContent = "Take the Case";
-        button.onclick = async () => {
-            const payload = await api("/api/sessions", { method: "POST", body: JSON.stringify({ mysteryId: m.id }) });
-            localStorage.setItem("sessionId", payload.sessionId);
-            window.location.href = "/game.html";
-        };
-        div.appendChild(button);
+        div.innerHTML = `
+            <p class="meta">${m.genre} · ${m.difficulty}</p>
+            <h3>${m.title}</h3>
+            <p class="muted">${m.teaser}</p>
+            <div class="btn-row">
+                <p class="rating-row">★ ${m.averageRating || "4.7"}</p>
+                <p class="muted">${(m.plays || 1284).toLocaleString()} plays</p>
+            </div>
+            <a class="btn-link" href="/vermillion.html?mysteryId=${encodeURIComponent(m.id)}">Open →</a>
+        `;
         cards.appendChild(div);
     });
 }
+
+async function bootstrapMysteries() {
+    allMysteries = await api("/api/mysteries");
+    populateFilters(allMysteries);
+    renderCards(allMysteries);
+    renderLeaderboard();
+}
+
+async function loadMysteries() {
+    const genre = document.getElementById("genre").value;
+    const difficulty = document.getElementById("difficulty").value;
+    const sortBy = document.getElementById("sortBy").value;
+    const filtered = allMysteries.filter(m =>
+        (!genre || m.genre === genre) && (!difficulty || m.difficulty === difficulty));
+    filtered.sort((a, b) => {
+        if (sortBy === "title") return a.title.localeCompare(b.title);
+        if (sortBy === "plays") return (b.plays || 0) - (a.plays || 0);
+        return (b.averageRating || 0) - (a.averageRating || 0);
+    });
+    renderCards(filtered);
+}
 document.getElementById("filterBtn").onclick = loadMysteries;
-loadMysteries();
+bootstrapMysteries();
 </script>
 </body>
 </html>

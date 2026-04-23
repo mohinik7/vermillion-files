@@ -14,7 +14,11 @@
     </header>
     <p class="eyebrow">Detective Records</p>
     <h2 class="candle-glow">Profile</h2>
-    <div class="card" id="stats"></div>
+    <div class="card">
+        <p class="meta">Renown Ledger</p>
+        <div class="amber-divider"></div>
+        <div id="stats"></div>
+    </div>
 </div>
 <script src="/app.js"></script>
 <script>
@@ -22,10 +26,10 @@ const userId = localStorage.getItem("userId");
 async function loadStats() {
     const data = await api(`/api/players/${userId}/stats`);
     document.getElementById("stats").innerHTML =
-        `<p>Sessions: ${data.sessions}</p>
-         <p>Solved Cases: ${data.solved}</p>
-         <p>Average Score: ${data.avgScore}</p>
-         <p>Reviews Written: ${data.reviews}</p>`;
+        `<p><strong>Sessions:</strong> ${data.sessions}</p>
+         <p><strong>Solved Cases:</strong> ${data.solved}</p>
+         <p><strong>Average Score:</strong> ${data.avgScore}</p>
+         <p><strong>Reviews Written:</strong> ${data.reviews}</p>`;
 }
 loadStats();
 </script>

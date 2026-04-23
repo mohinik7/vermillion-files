@@ -10,43 +10,68 @@
 <div class="container">
     <header class="topbar">
         <a href="/" class="brand">✦ The Vermillion Files</a>
-        <a class="btn-link" href="/hall.html">Back to Hall</a>
+        <div class="btn-row">
+            <a class="btn-link" href="/hall.html">Hall of Mysteries</a>
+            <a class="btn-link" href="/profile.html">Inspector</a>
+        </div>
     </header>
-    <p class="eyebrow">Case In Progress</p>
-    <h2 class="candle-glow">Night Investigation</h2>
-    <div class="game-grid">
-        <div class="card">
-            <h3 id="sceneTitle"></h3>
-            <p id="sceneAtmosphere" class="muted"></p>
-            <p id="sceneNarrative"></p>
-            <div id="choices"></div>
-        </div>
-        <div class="card">
-            <h3>Evidence Board</h3>
-            <div id="clues"></div>
-        </div>
-        <div class="card">
-            <h3>Suspect Tracker</h3>
+    <div class="scene-header">
+        <p class="meta" id="backCase">← The Vermillion Hour</p>
+        <p class="meta" id="sceneCount">Scene 1 of ~8</p>
+    </div>
+    <div class="scene-grid">
+        <aside class="card">
+            <div class="panel-title">
+                <h3>Suspects</h3>
+            </div>
             <div id="suspects"></div>
-        </div>
+        </aside>
+        <section class="card fade-scene">
+            <div id="sceneAtmosphere" class="scene-tags"></div>
+            <h2 id="sceneTitle" class="scene-heading"></h2>
+            <div class="amber-divider"></div>
+            <p id="sceneNarrative"></p>
+            <p class="meta decision-title">─── What do you do? ───</p>
+            <div id="choices"></div>
+        </section>
+        <aside class="card">
+            <div class="evidence-head">
+                <h3>Evidence Board</h3>
+                <p class="meta" id="evidenceCount">0/7</p>
+            </div>
+            <p class="muted">The corkboard is bare. Begin pinning what you find.</p>
+            <div id="clues"></div>
+        </aside>
     </div>
 </div>
 <script src="/app.js"></script>
 <script>
 const sessionId = localStorage.getItem("sessionId");
 if (!sessionId) window.location.href = "/hall.html";
+let sceneVisited = 0;
 
 async function loadScene() {
     const scene = await api(`/api/game/scene?sessionId=${sessionId}`);
-    document.getElementById("sceneTitle").textContent = scene.title;
-    document.getElementById("sceneAtmosphere").textContent = `Atmosphere: ${scene.atmosphere}`;
+    sceneVisited += 1;
+    const numerals = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"];
+    const numeral = numerals[Math.max(0, Math.min(sceneVisited - 1, numerals.length - 1))];
+    document.getElementById("sceneCount").textContent = `Scene ${sceneVisited} of ~8`;
+    document.getElementById("sceneTitle").textContent = `${numeral}. ${scene.title}`;
+    const tagWrap = document.getElementById("sceneAtmosphere");
+    tagWrap.innerHTML = "";
+    (scene.atmosphere || "").split(",").map(a => a.trim()).filter(Boolean).forEach(tag => {
+        const span = document.createElement("span");
+        span.className = "tag";
+        span.textContent = tag;
+        tagWrap.appendChild(span);
+    });
     document.getElementById("sceneNarrative").textContent = scene.narrative;
 
     const choicesDiv = document.getElementById("choices");
     choicesDiv.innerHTML = "";
     scene.choices.forEach(c => {
         const btn = document.createElement("button");
-        btn.className = "choice";
+        btn.className = "choice btn-candle";
         btn.textContent = c.text;
         btn.disabled = !c.enabled;
         btn.onclick = async () => {
@@ -62,20 +87,34 @@ async function loadScene() {
         if (document.getElementById(`clue-${clue.id}`)) return;
         const div = document.createElement("div");
         div.id = `clue-${clue.id}`;
-        div.className = "card";
-        div.innerHTML = `<strong>${clue.type}</strong><p>${clue.description}</p>`;
+        div.className = "clue-card";
+        div.innerHTML = `<p class="meta">${clue.type}</p><p><strong>${clue.id}</strong></p><p>${clue.description}</p>`;
         clues.appendChild(div);
     });
+    const count = clues.querySelectorAll(".clue-card").length;
+    document.getElementById("evidenceCount").textContent = `${count}/7`;
 
     const suspects = document.getElementById("suspects");
     suspects.innerHTML = "";
     scene.suspects.forEach(s => {
         const div = document.createElement("div");
-        div.className = "card";
-        div.innerHTML = `<strong>${s.name}</strong><p class="muted">${s.alibi}</p><p>${s.facts}</p><p class="status-pill">Tag: ${s.tag}</p>`;
+        div.className = "suspect-card";
+        const initial = (s.name || "?").trim().charAt(0).toUpperCase();
+        div.innerHTML = `
+            <div class="suspect-line">
+                <div class="suspect-initial">${initial}</div>
+                <div>
+                    <strong>${s.name}</strong>
+                    <p class="meta">${s.tag}</p>
+                </div>
+            </div>
+            <p class="muted">${s.alibi}</p>
+            <p>${s.facts}</p>
+            <p class="status-pill">Tag: ${s.tag}</p>
+        `;
         ["Cleared", "Suspicious", "Prime Suspect"].forEach(tag => {
             const t = document.createElement("button");
-            t.className = "tag-btn";
+            t.className = "choice btn-candle";
             t.textContent = tag;
             t.onclick = async () => {
                 await api("/api/game/suspect-tag", { method: "POST", body: JSON.stringify({ sessionId, suspectId: s.id, tag }) });

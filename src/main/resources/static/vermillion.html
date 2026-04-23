@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case File</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div class="container">
+    <header class="topbar">
+        <a href="/" class="brand">✦ The Vermillion Files</a>
+        <div class="btn-row">
+            <a class="btn-link" href="/hall.html">Hall of Mysteries</a>
+            <a class="btn-link" href="/login.html">Sign In</a>
+        </div>
+    </header>
+
+    <div class="case-shell">
+        <p class="meta">← Hall of Mysteries</p>
+        <article class="card hero-card">
+            <p class="meta" id="caseMeta">Gothic Noir · Detective · ★ 4.7 · 1,284 Plays</p>
+            <h1 class="candle-glow" id="caseTitle">The Vermillion Hour</h1>
+            <p class="meta" id="caseSubMeta">1923 · Vienna · Pension Adelgunde · Lead Investigator: Inspector Halloran</p>
+            <div class="amber-divider"></div>
+            <p class="hero-text muted" id="caseTeaser">
+                "A celebrated pianist found slumped over her keys at the stroke of midnight. The candles still burning. The window latched from within."
+            </p>
+
+            <div class="case-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="statScenes">~8</div>
+                    <p class="meta">Scenes</p>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statSuspects">4</div>
+                    <p class="meta">Suspects</p>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statClues">7</div>
+                    <p class="meta">Clues</p>
+                </div>
+            </div>
+
+            <button id="startCaseBtn">Light the First Candle</button>
+        </article>
+
+        <section style="margin-top: 20px;">
+            <h3>From the Field</h3>
+            <article class="card" style="margin-bottom: 10px;">
+                <div class="btn-row" style="justify-content: space-between;">
+                    <strong>M. Blackwood</strong><span class="rating-row">★★★★★</span>
+                </div>
+                <p class="muted">"The atmosphere alone earns the stars. Found myself reading aloud to no one."</p>
+            </article>
+            <article class="card">
+                <div class="btn-row" style="justify-content: space-between;">
+                    <strong>A. Whitcombe</strong><span class="rating-row">★★★★☆</span>
+                </div>
+                <p class="muted">"A delicious puzzle. The clue-gating is fair but unforgiving — as it should be."</p>
+            </article>
+        </section>
+    </div>
+</div>
+
+<script src="/app.js"></script>
+<script>
+const params = new URLSearchParams(window.location.search);
+const mysteryId = params.get("mysteryId") || "vermillion-hour";
+let loadedMystery = null;
+
+function parseSetting(setting) {
+    const pieces = (setting || "").split("·").map(p => p.trim()).filter(Boolean);
+    return pieces.join(" · ");
+}
+
+async function loadMystery() {
+    const all = await api("/api/mysteries");
+    loadedMystery = all.find(m => m.id === mysteryId) || all[0];
+    if (!loadedMystery) return;
+
+    document.getElementById("caseTitle").textContent = loadedMystery.title || "The Vermillion Hour";
+    document.getElementById("caseMeta").textContent = `${loadedMystery.genre} · ${loadedMystery.difficulty} · ★ ${loadedMystery.averageRating || 4.7} · ${(loadedMystery.plays || 1284).toLocaleString()} plays`;
+    document.getElementById("caseTeaser").textContent = `"${loadedMystery.teaser || ""}"`;
+    document.getElementById("caseSubMeta").textContent = `${parseSetting(loadedMystery.setting || "1923 · Vienna · Pension Adelgunde")} · Lead Investigator: ${loadedMystery.detective || "Inspector Halloran"}`;
+
+    const details = await api(`/api/mysteries/${loadedMystery.id}`);
+    document.getElementById("statScenes").textContent = `~${details.totalScenes || 8}`;
+    document.getElementById("statSuspects").textContent = `${(details.suspects || []).length || 4}`;
+    document.getElementById("statClues").textContent = `${details.clues ? Object.keys(details.clues).length : 7}`;
+}
+
+document.getElementById("startCaseBtn").onclick = async () => {
+    if (!loadedMystery) return;
+    try {
+        const payload = await api("/api/sessions", {
+            method: "POST",
+            body: JSON.stringify({ mysteryId: loadedMystery.id })
+        });
+        localStorage.setItem("sessionId", payload.sessionId);
+        localStorage.setItem("activeMysteryId", payload.mysteryId);
+        window.location.href = "/game.html";
+    } catch (e) {
+        window.location.href = "/login.html";
+    }
+};
+
+loadMystery();
+</script>
+</body>
+</html>

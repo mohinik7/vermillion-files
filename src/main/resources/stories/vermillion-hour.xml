@@ -1,0 +1,74 @@
+<mystery id="vermillion-hour" title="The Vermillion Hour" genre="Gothic Noir" difficulty="Detective" teaser="A celebrated pianist collapses at midnight behind locked windows and candlelight." start-scene="s1">
+    <clues>
+        <clue id="c1" type="Document">A half-burnt letter in violet ink threatens ruin if a debt is called in.</clue>
+        <clue id="c2" type="Physical">A sharp scent of bergamot lingers near the piano bench.</clue>
+        <clue id="c3" type="Testimony">Klaus heard the sonata stop abruptly at 11:47, long before the alarm was raised.</clue>
+        <clue id="c4" type="Physical">Liesl's umbrella is soaked, but her overcoat is completely dry.</clue>
+        <clue id="c5" type="Physical">An empty laudanum vial marked with Dr. Roth's apothecary seal lies behind the drape.</clue>
+        <clue id="c6" type="Physical">The latched casement window has freshly oiled hinges.</clue>
+        <clue id="c7" type="Document">A hidden ledger proves Margarethe is drowning in debt to the victim.</clue>
+    </clues>
+    <suspects>
+        <suspect id="su1" name="Klaus Wender" alibi="He claims he was reading by the lobby fire all evening." unlock-at-scene="s1">Concierge on duty and first to witness the aftermath.</suspect>
+        <suspect id="su2" name="Margarethe Holst" alibi="She says she stayed in her suite dictating letters." unlock-at-scene="s2">Patroness with strong social standing and hidden financial pressure.</suspect>
+        <suspect id="su3" name="Dr. Emil Roth" alibi="He says he was treating a child two doors down." unlock-at-scene="s5">House physician whose medicine appears at the scene.</suspect>
+        <suspect id="su4" name="Liesl Berger" alibi="She says she left at eleven and walked home in the rain." unlock-at-scene="s4">Young page turner who may have returned unseen.</suspect>
+    </suspects>
+    <scenes>
+        <scene id="s1" title="The Last Sonata" atmosphere="Rainy and tense">
+            <narrative>At fifteen past midnight you enter Pension Adelgunde. Frau Anneliese Vogt lies over the piano keys, candles burning low, and the corridor guests stand in shocked silence.</narrative>
+            <choice id="ch1" leads-to="s2">Examine the body and piano first.</choice>
+            <choice id="ch2" leads-to="s3">Question Klaus immediately.</choice>
+            <choice id="ch3" leads-to="s4">Search side rooms before interviews.</choice>
+        </scene>
+        <scene id="s2" title="The Bosendorfer Speaks" atmosphere="Quiet and methodical">
+            <narrative>No obvious wound appears, but violet lips suggest poison. A burnt letter is trapped between strings and bergamot hangs in the air.</narrative>
+            <clue-ref id="c1"/>
+            <clue-ref id="c2"/>
+            <choice id="ch4" leads-to="s3">Press Klaus on late-night visitors.</choice>
+            <choice id="ch5" leads-to="s5">Inspect the velvet drape and window.</choice>
+        </scene>
+        <scene id="s3" title="The Concierge's Account" atmosphere="Wary lamplight">
+            <narrative>Klaus insists no one used the main stair after eleven, yet the piano stopped at 11:47. The timeline opens a twelve-minute void.</narrative>
+            <clue-ref id="c3"/>
+            <choice id="ch6" leads-to="s4">Check Liesl's return story.</choice>
+            <choice id="ch7" leads-to="s5">Search the music room in detail.</choice>
+        </scene>
+        <scene id="s4" title="The Cloakroom Contradiction" atmosphere="Damp whispers">
+            <narrative>Liesl's umbrella drips beside a perfectly dry coat. Her account of walking home in rain does not hold together.</narrative>
+            <clue-ref id="c4"/>
+            <choice id="ch8" leads-to="s6">Confront Liesl directly.</choice>
+            <choice id="ch9" leads-to="s5">Ignore her for now and inspect the drape.</choice>
+        </scene>
+        <scene id="s5" title="Behind the Velvet Drape" atmosphere="Dust and revelation">
+            <narrative>In a hidden alcove you recover an empty laudanum vial. The casement is latched, but silent freshly oiled hinges reveal recent use.</narrative>
+            <clue-ref id="c5"/>
+            <clue-ref id="c6"/>
+            <choice id="ch10" leads-to="s7">Confront Dr. Roth about the vial.</choice>
+            <choice id="ch11" leads-to="s7b" requires-clue="c1">Use the letter to pressure Margarethe.</choice>
+            <choice id="ch12" leads-to="s6">Question Liesl about returning by the garden door.</choice>
+        </scene>
+        <scene id="s6" title="The Page Turner Falters" atmosphere="Trembling confession">
+            <narrative>Liesl admits she returned for her folio and heard two women arguing. She insists she touched nothing and fled in panic.</narrative>
+            <choice id="ch13" leads-to="s7b" requires-clue="c1">Confront Margarethe with the violet-ink threat.</choice>
+            <choice id="ch14" leads-to="s-dead">Accuse without evidence.</choice>
+            <choice id="ch15" leads-to="s5">Recheck the drape and window mechanism.</choice>
+        </scene>
+        <scene id="s-dead" title="A Closed Door" atmosphere="Frustration" ending="COLD_CASE">
+            <narrative>Without hard evidence, Margarethe dismisses your questions and retreats behind locked doors. The trail cools before dawn.</narrative>
+        </scene>
+        <scene id="s7" title="The Physician's Admission" atmosphere="Cold sweat">
+            <narrative>Roth confirms the vial is his but says it was full earlier in the victim's drawer. He quietly adds that Margarethe dined privately with the pianist.</narrative>
+            <choice id="ch16" leads-to="s8" requires-clue="c1">Confront Margarethe with letter and poison trail.</choice>
+            <choice id="ch17" leads-to="s7b">Search her suite for financial motive.</choice>
+        </scene>
+        <scene id="s7b" title="The Ledger in the Drawer" atmosphere="Whispers and truth">
+            <narrative>A hidden ledger confirms catastrophic debt and promissory notes owed to Anneliese. Ruin by morning was imminent.</narrative>
+            <clue-ref id="c7"/>
+            <choice id="ch18" leads-to="s8">Present the full chain of motive and method.</choice>
+        </scene>
+        <scene id="s8" title="The Vermillion Hour" atmosphere="Final reckoning" ending="SOLVED">
+            <narrative>Faced with the letter, scent, laudanum trail, and oiled window route, Margarethe confesses she chose the hour before bankruptcy chose her fate.</narrative>
+        </scene>
+    </scenes>
+</mystery>

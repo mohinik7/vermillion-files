@@ -5,6 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mystery Engine</title>
     <link rel="stylesheet" href="/styles.css">
+    <style>
+        .landing-hero { text-align: center; padding: 54px 0 72px; }
+        .landing-hero .eyebrow { text-align: center; }
+        .landing-hero .hero-text { margin: 0 auto 26px; max-width: 720px; }
+        .landing-hero .btn-row { justify-content: center; }
+        .landing-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 24px 0 66px; }
+        .step-num { font-size: 46px; margin-bottom: 6px; color: var(--amber-glow); font-family: "Cormorant Garamond", serif; }
+        .step-title { margin: 0 0 8px; font-size: 36px; }
+        .step-copy { margin: 0; line-height: 1.6; }
+        .featured-wrap { margin-top: 8px; margin-bottom: 54px; }
+        .featured-row { display: flex; align-items: end; justify-content: space-between; gap: 24px; }
+        .featured-title { margin: 0 0 6px; font-size: 64px; }
+        .featured-sub { margin-bottom: 14px; }
+        .site-foot { text-align: center; font-size: 11px; opacity: 0.65; letter-spacing: 0.24em; text-transform: uppercase; margin-bottom: 10px; }
+        @media (max-width: 900px) {
+            .landing-steps { grid-template-columns: 1fr; }
+            .featured-row { flex-direction: column; align-items: flex-start; }
+            .featured-title { font-size: 50px; }
+        }
+    </style>
 </head>
 <body>
 <div class="container">
@@ -15,15 +35,49 @@
             <a class="btn-link" href="/register.html">Open Case File</a>
         </div>
     </header>
-    <p class="eyebrow">A Solo Detective Experience</p>
-    <h1 class="candle-glow">The Vermillion<br>Files</h1>
-    <p class="hero-text muted">Step into candlelit noir mysteries, gather evidence, interrogate suspects, and name the killer before the night swallows the truth.</p>
-    <div class="card">
+
+    <section class="landing-hero">
+        <p class="eyebrow">─── A Solo Detective Experience ───</p>
+        <h1 class="candle-glow">The Vermillion<br>Files</h1>
+        <p class="hero-text muted">Step into the parlour. The candles are lit. A body lies cooling in the next room — and only you can name the hand that did it.</p>
         <div class="btn-row">
-            <a class="btn-link" href="/hall.html">Enter Hall of Mysteries</a>
-            <a class="btn-link" href="/register.html">Create Account</a>
+            <a class="btn-link" href="/hall.html">Enter the Hall of Mysteries</a>
+            <a class="btn-link" href="/register.html">Open a Case File</a>
         </div>
-    </div>
+        <div class="amber-divider" style="max-width: 340px; margin: 46px auto 0;"></div>
+    </section>
+
+    <section class="landing-steps">
+        <article class="card">
+            <div class="step-num">I</div>
+            <h3 class="step-title">Read the Scene</h3>
+            <p class="step-copy muted">Atmospheric prose sets the stage. Tonight: rain on the windows, a guttering candle, a violet-ink letter half-burnt.</p>
+        </article>
+        <article class="card">
+            <div class="step-num">II</div>
+            <h3 class="step-title">Weigh the Evidence</h3>
+            <p class="step-copy muted">Every scene reveals new clues. Pin them to your evidence board. Watch suspects shift from cleared to prime.</p>
+        </article>
+        <article class="card">
+            <div class="step-num">III</div>
+            <h3 class="step-title">Make Your Choice</h3>
+            <p class="step-copy muted">Branching paths. Wrong turns cost you. Some doors only open if you've seen the right thing.</p>
+        </article>
+    </section>
+
+    <section class="featured-wrap">
+        <p class="meta">Tonight's Featured Case</p>
+        <div class="card hero-card featured-row">
+            <div>
+                <h2 class="featured-title">The Vermillion Hour</h2>
+                <p class="meta featured-sub">1923 · Vienna · Pension Adelgunde · Inspector Halloran</p>
+                <p class="hero-text muted" style="max-width: 760px; margin: 0;">"A celebrated pianist found slumped over her keys at the stroke of midnight. The candles still burning. The window latched from within."</p>
+            </div>
+            <a class="btn-link" href="/hall.html">Take the Case →</a>
+        </div>
+    </section>
+
+    <footer class="site-foot">✦ Established in Shadow · MMXXVI ✦</footer>
 </div>
 </body>
 </html>

@@ -47,4 +47,14 @@ public class AuthController {
         session.invalidate();
         return ResponseEntity.ok(Map.of("status", "ok"));
     }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> me(HttpSession session) {
+        Object userId = session.getAttribute("userId");
+        Object username = session.getAttribute("username");
+        if (userId == null || username == null) {
+            return ResponseEntity.status(401).body(Map.of("error", "Not authenticated"));
+        }
+        return ResponseEntity.ok(Map.of("id", userId, "username", username));
+    }
 }

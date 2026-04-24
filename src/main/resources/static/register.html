@@ -10,7 +10,6 @@
 <div class="container">
     <header class="topbar">
         <a href="/" class="brand">✦ The Vermillion Files</a>
-        <a class="btn-link" href="/login.html">Sign In</a>
     </header>
     <p class="eyebrow">Open a New Case File</p>
     <h2 class="candle-glow">Register</h2>
@@ -29,12 +28,27 @@
 </div>
 <script src="/app.js"></script>
 <script>
+const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+
+function isValidEmail(email) {
+    if (!emailRegex.test(email) || email.length > 254 || email.includes(" ")) return false;
+    const [local, domain] = email.split("@");
+    if (!local || !domain) return false;
+    if (local.startsWith(".") || local.endsWith(".") || domain.startsWith(".") || domain.endsWith(".")) return false;
+    if (local.includes("..") || domain.includes("..")) return false;
+    return true;
+}
+
 document.getElementById("registerBtn").onclick = async () => {
     const username = document.getElementById("username").value.trim();
-    const email = document.getElementById("email").value.trim();
+    const email = document.getElementById("email").value.trim().toLowerCase();
     const password = document.getElementById("password").value.trim();
     if (!username || !email || password.length < 6) {
         document.getElementById("msg").textContent = "Fill all fields (password >= 6 chars).";
+        return;
+    }
+    if (!isValidEmail(email)) {
+        document.getElementById("msg").textContent = "Please enter a valid email address.";
         return;
     }
     try {

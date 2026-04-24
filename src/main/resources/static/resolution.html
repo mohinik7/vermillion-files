@@ -5,48 +5,198 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Resolution</title>
     <link rel="stylesheet" href="/styles.css">
+    <style>
+        .resolution-shell {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .verdict-block {
+            text-align: center;
+            margin-bottom: 18px;
+        }
+        .verdict-title {
+            margin-bottom: 8px;
+        }
+        .result-stack > .card {
+            margin-bottom: 16px;
+        }
+        .renown-value {
+            font-size: 72px;
+            color: var(--amber-glow);
+            font-family: "Cormorant Garamond", "Playfair Display", Georgia, serif;
+            text-align: center;
+            line-height: 1;
+            margin-bottom: 14px;
+        }
+        .path-box {
+            border: 1px dashed rgba(243, 190, 99, 0.35);
+            border-radius: 10px;
+            padding: 14px 16px;
+            background: rgba(10, 15, 25, 0.35);
+        }
+        .path-step {
+            margin: 0 0 9px;
+            color: var(--muted);
+            font-style: italic;
+        }
+        .path-step:last-child {
+            margin-bottom: 0;
+        }
+        .path-label {
+            display: block;
+            margin-bottom: 3px;
+            color: var(--amber-glow);
+            font-style: normal;
+        }
+        .review-wrap .card {
+            margin-bottom: 0;
+        }
+        .review-success {
+            text-align: center;
+            padding: 24px 20px;
+        }
+        .review-success h3 {
+            margin-bottom: 6px;
+            color: var(--amber-glow);
+        }
+        .resolution-actions {
+            margin-top: 18px;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+    </style>
 </head>
 <body>
 <div class="container">
     <header class="topbar">
         <a href="/" class="brand">✦ The Vermillion Files</a>
-        <a class="btn-link" href="/hall.html">Return to Hall</a>
     </header>
-    <p class="eyebrow">Final Verdict</p>
-    <h2 class="candle-glow">Resolution</h2>
-    <div class="card result-card" id="resultCard"></div>
-    <div class="card">
-        <p class="meta">Case File Export</p>
-        <div class="amber-divider"></div>
-        <div class="btn-row">
-            <button id="downloadBtn">Download Case File XML</button>
-            <a class="btn-link" href="/hall.html">Back to Hall</a>
-        </div>
-    </div>
-    <div class="card">
-        <h3>Rate this Mystery</h3>
-        <p class="muted">Leave a note for the next detective who lifts this candle.</p>
-        <div class="amber-divider"></div>
-        <input id="mysteryId" placeholder="Mystery ID (e.g., vermillion-hour)">
-        <select id="rating"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select>
-        <textarea id="comment" placeholder="Optional review"></textarea>
-        <button id="submitReviewBtn">Submit Review</button>
-    </div>
+
+    <main class="resolution-shell">
+        <section class="verdict-block">
+            <p class="eyebrow">─── The Verdict ───</p>
+            <h2 class="candle-glow verdict-title" id="verdictTitle">Case Solved</h2>
+            <p class="hero-text muted" style="font-size: 28px; margin: 0 auto;" id="verdictMystery">The Vermillion Hour</p>
+        </section>
+
+        <section class="result-stack">
+            <div class="card">
+                <p class="meta">─── Closing Note ───</p>
+                <p class="hero-text muted" style="font-size: 26px; margin: 0;" id="closingNote">
+                    CASE SOLVED — Margarethe Holst, facing ruin from debts called in by her former patron, administered a fatal dose of laudanum during their private supper, then slipped back through the music-room window to establish her alibi.
+                </p>
+            </div>
+
+            <div class="card">
+                <p class="meta" style="text-align:center;">Final Renown</p>
+                <div class="renown-value candle-glow" id="renownValue">1710</div>
+                <div class="case-stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="scenesVisited">6</div>
+                        <p class="meta">Scenes Visited</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="cluesFound">5/7</div>
+                        <p class="meta">Clues Found</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="choicesMade">5</div>
+                        <p class="meta">Choices Made</p>
+                    </div>
+                </div>
+                <div class="amber-divider"></div>
+                <p class="meta">✦ ✦ Review the Path You Walked</p>
+                <div class="path-box" id="pathBox"></div>
+            </div>
+
+            <div class="card">
+                <p class="meta">Case File Export</p>
+                <h3 style="margin-bottom: 4px;">Case File Export</h3>
+                <p class="muted" style="margin-top: 0;">A bound XML record of your investigation.</p>
+                <div class="btn-row">
+                    <button id="downloadBtn">↓ Download .xml</button>
+                </div>
+            </div>
+
+            <div class="review-wrap" id="reviewWrap">
+                <div class="card">
+                    <h3>Leave a Mark</h3>
+                    <p class="muted">Rate this mystery for the next detective who lifts the candle.</p>
+                    <div class="amber-divider"></div>
+                    <input id="mysteryId" placeholder="Mystery ID (e.g., vermillion-hour)">
+                    <select id="rating"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select>
+                    <textarea id="comment" placeholder="A note for the casebook…"></textarea>
+                    <button id="submitReviewBtn">Submit Review</button>
+                </div>
+            </div>
+
+            <div class="resolution-actions">
+                <a class="btn-link" href="/hall.html">← Hall of Mysteries</a>
+                <a class="btn-link" id="investigateAgainLink" href="/vermillion.html">Investigate Again</a>
+            </div>
+        </section>
+    </main>
 </div>
 <script src="/app.js"></script>
 <script>
 const sessionId = localStorage.getItem("sessionId");
 const activeMysteryId = localStorage.getItem("activeMysteryId") || "vermillion-hour";
 document.getElementById("mysteryId").value = activeMysteryId;
+
+const fallbackPathByMystery = {
+    "vermillion-hour": [
+        "Examine the body and the piano first.",
+        "Search behind the velvet drape.",
+        "Confront Dr. Roth about the vial.",
+        "Search Margarethe's suite for the ledger.",
+        "Confront Margarethe with everything."
+    ]
+};
+
+function guessSuspectFromClosingNote(note) {
+    if (!note) return "Unknown suspect";
+    const match = note.match(/CASE SOLVED\s*[—-]\s*([^,]+?)(?:,|\s+facing|\s+was|\s+is)/i);
+    return match ? match[1].trim() : "Unknown suspect";
+}
+
+function renderPathBox(pathLines, missedClues) {
+    const root = document.getElementById("pathBox");
+    const pathHtml = (pathLines || []).map((line, index) => `
+        <p class="path-step">
+            <span class="meta path-label">Scene ${index + 1}</span>
+            "${line}"
+        </p>
+    `).join("");
+
+    const cluesHtml = missedClues && missedClues.length
+        ? `<div class="amber-divider"></div>
+           <p class="meta">Clues You Never Found</p>
+           ${(missedClues).map((clue) => `<p class="path-step">· ${clue}</p>`).join("")}`
+        : "";
+
+    root.innerHTML = pathHtml + cluesHtml;
+}
+
 async function loadResolution() {
     const data = await api(`/api/sessions/${sessionId}/resolution`);
-    document.getElementById("resultCard").innerHTML =
-        `<p class="meta">Case Outcome</p>
-         <p>Status: <strong>${data.status}</strong></p>
-         <p>Score: <strong>${data.score}</strong></p>
-         <p>Scenes Visited: ${data.scenesVisited}</p>
-         <p>Wrong Branches: ${data.wrongBranches}</p>
-         <p>Clues: ${data.cluesFound}/${data.totalClues}</p>`;
+    const mystery = await api(`/api/mysteries/${encodeURIComponent(activeMysteryId)}`);
+    const isSolved = String(data.status || "").toUpperCase() === "SOLVED";
+
+    const closingNote = "CASE SOLVED — Margarethe Holst, facing ruin from debts called in by her former patron, administered a fatal dose of laudanum during their private supper, then slipped back through the music-room window to establish her alibi.";
+    const pathFallback = fallbackPathByMystery[activeMysteryId] || [];
+    const pathLines = (data.pathChoices || []).length ? data.pathChoices : pathFallback;
+
+    document.getElementById("verdictTitle").textContent = isSolved ? "Case Solved" : "Case Inconclusive";
+    document.getElementById("verdictMystery").textContent = mystery?.title || "The Vermillion Hour";
+    document.getElementById("closingNote").textContent = closingNote;
+    document.getElementById("renownValue").textContent = `${data.score ?? 0}`;
+    document.getElementById("scenesVisited").textContent = `${data.scenesVisited ?? 0}`;
+    document.getElementById("cluesFound").textContent = `${data.cluesFound ?? 0}/${data.totalClues ?? 0}`;
+    document.getElementById("choicesMade").textContent = `${data.choicesMade ?? Math.max(0, (data.scenesVisited || 1) - 1)}`;
+
+    renderPathBox(pathLines, data.missedClues || []);
 }
 document.getElementById("downloadBtn").onclick = () => {
     window.location.href = `/api/sessions/${sessionId}/casefile`;
@@ -60,8 +210,15 @@ document.getElementById("submitReviewBtn").onclick = async () => {
             comment: document.getElementById("comment").value
         })
     });
-    alert("Review entered in the ledger");
+    document.getElementById("reviewWrap").innerHTML = `
+        <div class="card review-success">
+            <h3>Thank you, detective.</h3>
+            <p class="muted" style="font-style: italic; margin: 0;">Your mark has been entered into the ledger.</p>
+        </div>
+    `;
 };
+
+document.getElementById("investigateAgainLink").href = `/vermillion.html?mysteryId=${encodeURIComponent(activeMysteryId)}`;
 loadResolution();
 </script>
 </body>

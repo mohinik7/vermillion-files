@@ -5,31 +5,159 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile</title>
     <link rel="stylesheet" href="/styles.css">
+    <style>
+        .profile-shell {
+            max-width: 980px;
+            margin: 0 auto;
+        }
+        .dossier-card {
+            padding: 30px 34px;
+        }
+        .dossier-head {
+            display: grid;
+            grid-template-columns: 96px 1fr;
+            gap: 24px;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+        .dossier-seal {
+            width: 96px;
+            height: 96px;
+            border-radius: 999px;
+            background: linear-gradient(180deg, #d29a3e, #b97a2c);
+            color: #201308;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: "Cormorant Garamond", "Playfair Display", Georgia, serif;
+            font-size: 52px;
+            border: 1px solid rgba(243, 190, 99, 0.55);
+        }
+        .dossier-name {
+            margin: 0 0 2px;
+            line-height: 0.95;
+        }
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 18px;
+        }
+        .profile-stat {
+            text-align: center;
+            border: 1px solid rgba(243, 190, 99, 0.2);
+            border-radius: 10px;
+            padding: 16px 10px;
+            background: rgba(12, 18, 28, 0.32);
+        }
+        .profile-stat-value {
+            color: var(--amber-glow);
+            font-family: "Cormorant Garamond", "Playfair Display", Georgia, serif;
+            font-size: 52px;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+        .casebook-title {
+            margin-top: 20px;
+        }
+        .casebook-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .back-link {
+            margin-top: 14px;
+            text-align: center;
+        }
+        .back-link a {
+            color: var(--amber-glow);
+            text-decoration: none;
+            border-bottom: 1px solid rgba(243, 190, 99, 0.35);
+        }
+        @media (max-width: 900px) {
+            .profile-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .dossier-head {
+                grid-template-columns: 1fr;
+                justify-items: start;
+            }
+        }
+    </style>
 </head>
 <body>
 <div class="container">
     <header class="topbar">
         <a href="/" class="brand">✦ The Vermillion Files</a>
-        <a class="btn-link" href="/hall.html">Back to Hall</a>
     </header>
-    <p class="eyebrow">Detective Records</p>
-    <h2 class="candle-glow">Profile</h2>
-    <div class="card">
-        <p class="meta">Renown Ledger</p>
-        <div class="amber-divider"></div>
-        <div id="stats"></div>
-    </div>
+
+    <main class="profile-shell">
+        <p class="eyebrow">Detective Records</p>
+        <h2 class="candle-glow">Profile</h2>
+
+        <section class="card dossier-card">
+            <div class="dossier-head">
+                <div class="dossier-seal" id="sealInitial">I</div>
+                <div>
+                    <p class="meta">Detective Dossier</p>
+                    <h3 class="candle-glow dossier-name" id="detectiveName">inspector</h3>
+                    <p class="meta" id="swornIn">Sworn in · 24 April 2026</p>
+                </div>
+            </div>
+            <div class="amber-divider"></div>
+            <div class="profile-stats" id="stats"></div>
+        </section>
+
+        <h3 class="casebook-title">Casebook</h3>
+        <section class="card">
+            <div class="casebook-row">
+                <div>
+                    <h3 style="margin: 0 0 4px;" id="casebookPrimaryTitle">The Vermillion Hour</h3>
+                    <p class="meta" id="casebookMeta">24 April 2026 · Solved</p>
+                </div>
+                <div style="text-align: right;">
+                    <div class="profile-stat-value" id="casebookRenown">0</div>
+                    <p class="meta">Renown</p>
+                </div>
+            </div>
+        </section>
+        <p class="back-link"><a href="/hall.html">← Back to the Hall of Mysteries</a></p>
+    </main>
 </div>
 <script src="/app.js"></script>
 <script>
 const userId = localStorage.getItem("userId");
+const username = localStorage.getItem("username") || "inspector";
+
 async function loadStats() {
     const data = await api(`/api/players/${userId}/stats`);
+    document.getElementById("detectiveName").textContent = username;
+    document.getElementById("sealInitial").textContent = username.charAt(0).toUpperCase();
+    const joinedDate = data.createdAt ? new Date(`${data.createdAt}T00:00:00`) : new Date();
+    const swornIn = joinedDate.toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" });
+    document.getElementById("swornIn").textContent = `Sworn in · ${swornIn}`;
+
     document.getElementById("stats").innerHTML =
-        `<p><strong>Sessions:</strong> ${data.sessions}</p>
-         <p><strong>Solved Cases:</strong> ${data.solved}</p>
-         <p><strong>Average Score:</strong> ${data.avgScore}</p>
-         <p><strong>Reviews Written:</strong> ${data.reviews}</p>`;
+        `<div class="profile-stat">
+            <div class="profile-stat-value">${data.sessions}</div>
+            <p class="meta">Sessions</p>
+        </div>
+        <div class="profile-stat">
+            <div class="profile-stat-value">${data.solved}</div>
+            <p class="meta">Solved Cases</p>
+        </div>
+        <div class="profile-stat">
+            <div class="profile-stat-value">${data.avgScore}</div>
+            <p class="meta">Average Score</p>
+        </div>
+        <div class="profile-stat">
+            <div class="profile-stat-value">${data.reviews}</div>
+            <p class="meta">Reviews Written</p>
+        </div>`;
+
+    document.getElementById("casebookRenown").textContent = `${data.avgScore}`;
+    document.getElementById("casebookMeta").textContent = `${swornIn} · ${data.solved > 0 ? "Solved" : "Unsolved"}`;
 }
 loadStats();
 </script>

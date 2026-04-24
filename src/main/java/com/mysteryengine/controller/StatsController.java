@@ -5,6 +5,7 @@ import com.mysteryengine.model.Review;
 import com.mysteryengine.repository.GameSessionRepository;
 import com.mysteryengine.repository.LeaderboardEntryRepository;
 import com.mysteryengine.repository.ReviewRepository;
+import com.mysteryengine.repository.UserRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,13 +18,16 @@ public class StatsController {
     private final LeaderboardEntryRepository leaderboardEntryRepository;
     private final GameSessionRepository gameSessionRepository;
     private final ReviewRepository reviewRepository;
+    private final UserRepository userRepository;
 
     public StatsController(LeaderboardEntryRepository leaderboardEntryRepository,
                            GameSessionRepository gameSessionRepository,
-                           ReviewRepository reviewRepository) {
+                           ReviewRepository reviewRepository,
+                           UserRepository userRepository) {
         this.leaderboardEntryRepository = leaderboardEntryRepository;
         this.gameSessionRepository = gameSessionRepository;
         this.reviewRepository = reviewRepository;
+        this.userRepository = userRepository;
     }
 
     @GetMapping("/leaderboard/{mysteryId}")
@@ -45,6 +49,15 @@ public class StatsController {
         List<Review> reviews = reviewRepository.findByUserId(id);
         long solvedCount = sessions.stream().filter(s -> "SOLVED".equals(s.getStatus())).count();
         double avgScore = sessions.stream().filter(s -> s.getScore() != null).mapToInt(GameSession::getScore).average().orElse(0);
-        return Map.of("sessions", sessions.size(), "solved", solvedCount, "avgScore", Math.round(avgScore), "reviews", reviews.size());
+        String joinedAt = userRepository.findById(id)
+                .map(user -> user.getCreatedAt().toLocalDate().toString())
+                .orElse(null);
+        return Map.of(
+                "sessions", sessions.size(),
+                "solved", solvedCount,
+                "avgScore", Math.round(avgScore),
+                "reviews", reviews.size(),
+                "createdAt", joinedAt
+        );
     }
 }
